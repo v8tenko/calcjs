@@ -1,6 +1,6 @@
 import React, {FC} from 'react'
 import "./CalculatorButton.sass"
-import {append, clear, commitMathOperation, calculate} from "../../features/inputSplice";
+import {append, calculate, clear, commitOperation } from "../../features/inputSplice";
 import {useAppDispatch} from "../../app/hooks";
 import {Operations, Operator} from "../../types/Operations";
 
@@ -54,14 +54,14 @@ export const OperationCalculatorButton: FC<{ type: Operations }> = ({type}) => {
         } else if (type === Operations.clear) {
             dispatch(clear())
         } else {
-            dispatch(commitMathOperation(type))
+            dispatch(commitOperation(type))
         }
     }
 
     return (
         <CalculatorButton
             id={Operator.parseOperation(type)}
-            content={Operator.toString(type)}
+            content={Operator.toString(type, {otherSymbol: true})}
             onClick={appendOperation}
             background={colorOfType(type)}
         />

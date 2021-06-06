@@ -2,8 +2,17 @@ export enum Operations {
     add, subtract, multiply, divide, equals, clear
 }
 
+export const highPriority = ['/', '⋅']
+export const lowPriority = ['+', '-']
+
+export const isInLowPriority = (x: string) => lowPriority.includes(x)
+export const isInHighPriority = (x: string) => highPriority.includes(x)
+
 export class Operator {
-    static toString(value: Operations) {
+
+
+
+    static toString(value: Operations, settings: {otherSymbol: boolean} = {otherSymbol: false}) {
         switch (value) {
             case Operations.divide:
                 return '/'
@@ -12,13 +21,29 @@ export class Operator {
             case Operations.add:
                 return '+'
             case Operations.multiply:
-                return 'x'
+                return settings?.otherSymbol ? 'x' : '⋅'
             case Operations.equals:
                 return '='
             case Operations.clear:
                 return 'AC'
         }
     }
+
+    static parse(value: string): Operations {
+        switch (value) {
+            case '+':
+                return Operations.add
+            case '-':
+                return Operations.subtract
+            case '/':
+                return Operations.divide
+            case '⋅':
+                return Operations.multiply
+            default:
+                return Operations.equals
+        }
+    }
+
 
     static call(type: Operations | null, x: number, y: number | null): number {
         if (y === null) {
@@ -48,7 +73,7 @@ export class Operator {
                 r = 0
                 break
         }
-        return +r.toPrecision(5)
+        return +r.toFixed(5)
     }
 
     static all(): Operations[] {
