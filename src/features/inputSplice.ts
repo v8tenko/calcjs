@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Operations, Operator, isInLowPriority, isInHighPriority} from "../types/Operations";
+import {Operations, Operator, isInLowPriority} from "../types/Operations";
 
 export interface InputState {
     log: string,
@@ -23,6 +23,15 @@ const inputSplit = createSlice({
             if (state.input.length === 1 && !/[0-9]/.test(state.input)) {
                 state.input = ''
             }
+            if (state.input.slice(-1) === '0' && action.payload === '0') {
+                state.isNew = false
+                return
+            }
+            if (state.log.includes('=')) {
+                state.log = '0'
+                state.input = '0'
+                state.isNew = true
+            }
             if (state.isNew) {
                 state.isNew = false
                 if (/[0-9]/.test(action.payload)) {
@@ -41,13 +50,21 @@ const inputSplit = createSlice({
         commitOperation(state, action: PayloadAction<Operations>) {
             const logSign = Operator.toString(action.payload)
             const inputSign = Operator.toString(action.payload, {otherSymbol: true})
+            if (state.log.includes('=')) {
+                state.log = state.log.slice(state.log.lastIndexOf('=') + 1)
+            }
             if (state.isNew) {
                 state.input = inputSign
                 state.log = logSign
                 return
             }
             const last = state.log.slice(-2)
-            const count = last.split('').filter(isOperation).length
+            let count = 0
+            if (last.split('').filter(isOperation).length === 2) {
+                count = 2
+            } else if (isOperation(last.slice(-1))) {
+                count = 1
+            }
             if (action.payload !== Operations.subtract) {
                 if (count) {
                     state.log = state.log.slice(0, -count) + logSign
@@ -68,6 +85,9 @@ const inputSplit = createSlice({
         calculate(state) {
             if (['/', '⋅'].includes(state.log[0])) {
                 return
+            }
+            while (isOperation(state.log.slice(-1)[0])) {
+                state.log = state.log.slice(0, -1)
             }
             let actions: (number | string)[] = []
             let added = false
@@ -93,7 +113,6 @@ const inputSplit = createSlice({
                 }
                 current && actions.push(+current)
             }
-            // TODO make last in action only number
             const calc = (act: (number | string)[]): number => {
                 if (act.length === 3) {
                     return Operator.call(
@@ -118,7 +137,6 @@ const inputSplit = createSlice({
                 }
                 return calc([start, ...act.slice(nextIdx)])
             }
-            debugger
             const res = (+calc(actions).toFixed(5)).toString()
             if (added) {
                 state.log = state.log.slice(1)

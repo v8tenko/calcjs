@@ -73,7 +73,7 @@ export class Operator {
                 r = 0
                 break
         }
-        return +r.toFixed(5)
+        return +r.toFixed(10)
     }
 
     static all(): Operations[] {

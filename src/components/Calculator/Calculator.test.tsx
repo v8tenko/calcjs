@@ -75,12 +75,17 @@ describe('базовые тесты калькулятора', () => {
         expect(screen.getAllByText('1234.567=1234.567').length).toBe(1)
         expect(screen.getAllByText('1234.567').length).toBe(1)
         clear()
+        click(1, '+', '-', '=')
+        expect(screen.getAllByText('1=1').length).toBe(1)
+        expect(screen.getAllByText('1').length).toBe(2)
+        clear()
     })
 
     test('операторы с числами', () => {
         click(1, 2, '+', 'x', '-', 7, 9, '.', 1, '+', 'x', 1, 6, '=')
         expect(screen.getAllByText('12⋅-79.1⋅16=-15187.2').length).toBe(1)
         expect(screen.getAllByText('-15187.2').length).toBe(1)
+        clear()
         click(3, 4, '.', 6, 7, 'x', '-', 9, '+', '-', 'x', '/', '+', '-', 9, 1, 2, 5, '.', 1, 3, '=')
         expect(screen.getAllByText('34.67⋅-9+-9125.13=-9437.16').length).toBe(1)
         expect(screen.getAllByText('-9437.16').length).toBe(1)
@@ -89,12 +94,13 @@ describe('базовые тесты калькулятора', () => {
     })
 
     test('использование предыдущего значения в следующих расчетах', () => {
-        click(1, 2, '+', 3, '.', 4, '=', '/', '-', 8, 9, '=', 'x', 9, '.', 5, '=')
-        expect(screen.getAllByText('-1.730337078652⋅9.5=-16.438202247194').length).toBe(1)
-        expect(screen.getAllByText('-16.438202247194').length).toBe(1)
+        click(1, 2, '+', 3, '.', 4, '=', '/', '-', 8, '.', 9, '=', 'x', 9, '.', 5, '=')
+        expect(screen.getAllByText('-1.73034⋅9.5=-16.43823').length).toBe(1)
+        expect(screen.getAllByText('-16.43823').length).toBe(1)
+        clear()
         click(3, 4, '.', 5, '=', 'x', '-', '/', 8, '.', 0, 1, 'x', 9, '=', '-', 5, 1, '=', '+', 1, '.', 9, '=')
-        expect(screen.getAllByText('-12.23595505618+1.9=-10.33595505618').length).toBe(1)
-        expect(screen.getAllByText('-10.33595505618').length).toBe(1)
+        expect(screen.getAllByText('-12.23596+1.9=-10.33596').length).toBe(1)
+        expect(screen.getAllByText('-10.33596').length).toBe(1)
         clear()
     })
 
